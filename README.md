@@ -1,43 +1,100 @@
-# Astro Starter Kit: Minimal
+# Pandesal Express Bakery - Client Frontend
 
-```sh
-bun create astro@latest -- --template minimal
+A comprehensive inventory management system with face recognition attendance for Pandesal Express Bakery operations.
+
+## Overview
+
+This frontend application provides a complete business management solution for bakery operations, featuring:
+
+- **Face Recognition Attendance** - Biometric employee check-in/check-out system also acts as authentication
+- **Multi-Store Operations** - Support for multiple bakery locations
+- **Inventory Management** - Real-time stock tracking and delivery management
+- **Role-Based Access** - Admin, Cashier, and Commissary user roles
+
+## Tech Stack
+
+- **Framework**: Astro 5.14 with SSR
+- **Frontend**: React 19 + TypeScript
+- **Styling**: Tailwind CSS + HeroUI components
+- **State Management**: Nanostores
+- **HTTP Client**: Axios
+
+## Development Setup
+
+### Prerequisites
+
+- Node.js 18+
+- Bun
+
+### Installation
+
+```bash
+# Install dependencies
+bun install
+
+# Start development server
+bun run dev
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+### Local Environment Configuration
 
-## 🚀 Project Structure
+Create `.env` file with:
 
-Inside of your Astro project, you'll see the following folders and files:
-
-```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
+```env
+PUBLIC_API_URL="https://localhost:7017"
+PUBLIC_KEY_PATH="./cert/pandesal-express.key"
+PUBLIC_CERT_PATH="./cert/pandesal-express.crt"
 ```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+### Available Scripts
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+```bash
+bun run dev      # Start development server (port 3000)
+bun run build    # Build for production
+bun run preview  # Preview production build
+```
 
-Any static assets, like images, can be placed in the `public/` directory.
+## Key Features
 
-## 🧞 Commands
+### Authentication & Authorization
+- JWT-based authentication with refresh tokens
+- Role-based access control (Cashier and Commissary)
+- Secure middleware for route protection
 
-All commands are run from the root of the project, from a terminal:
+### Face Recognition Attendance
+- Real-time camera integration
+- Biometric employee identification
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `bun install`             | Installs dependencies                            |
-| `bun dev`             | Starts local dev server at `localhost:4321`      |
-| `bun build`           | Build your production site to `./dist/`          |
-| `bun preview`         | Preview your build locally, before deploying     |
-| `bun astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `bun astro -- --help` | Get help using the Astro CLI                     |
+### Multi-Store Management
+- Individual store dashboards
+- Store-specific inventory tracking
+- Inter-store stock transfers
 
-## 👀 Want to learn more?
+### Inventory & Sales
+- Real-time stock monitoring
+- Delivery receipt management
+- End-of-shift reporting
 
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+## API Integration
+
+The frontend communicates with backend services through:
+- Main API: `https://localhost:7017`
+
+All API calls are authenticated through face recognition using JWT tokens with automatic refresh handling.
+
+## Deployment
+
+Built for server-side rendering with Vercel adapter.
+
+```bash
+bun run build
+vercel deploy
+```
+
+## Contributing
+
+1. Follow TypeScript strict mode guidelines
+2. Use existing component patterns and hooks
+3. Maintain consistent styling with Tailwind CSS
+4. Test authentication flows thoroughly
+5. Ensure responsive design compatibility

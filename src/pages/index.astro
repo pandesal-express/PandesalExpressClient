@@ -1,5 +1,17 @@
 ---
+import CameraComponent from "@/components/CameraComponent";
 import MainLayout from "@/layouts/MainLayout.astro";
+
+const error = Astro.locals.error;
 ---
 
-<MainLayout></MainLayout>
+<MainLayout>
+    <main class='flex items-center justify-center py-12'>
+        <div class='flex w-full max-w-screen-md flex-col items-start'>
+            <h4 class='text-lg font-semibold text-default-foreground mb-8 px-4 sm:px-0'>
+                Face Recognition Attendance
+            </h4>
+            <CameraComponent serverError={error} client:load />
+        </div>
+    </main>
+</MainLayout>

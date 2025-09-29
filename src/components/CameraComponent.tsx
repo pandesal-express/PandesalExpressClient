@@ -43,17 +43,13 @@ const CameraComponent = ({serverError}: { serverError?: string }) => {
                 return;
             }
 
+            // To send image (Blob), check_in (bool), and store_id (string)
             const formData = new FormData();
             formData.append('image', blob, 'image.png');
-            formData.append('isCheckIn', isCheckIn ? 'true' : 'false');
+            formData.append('check_in', isCheckIn ? 'true' : 'false');
 
             if (storeIdFromUrl) {
-                formData.append('storeId', storeIdFromUrl);
-            }
-
-            console.log("FormData to be sent to Astro API route:");
-            for (const [key, value] of formData.entries()) {
-                console.log(key, value);
+                formData.append('store_id', storeIdFromUrl);
             }
 
             fetch("/api/check-attendance", {

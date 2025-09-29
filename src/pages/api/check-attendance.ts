@@ -5,16 +5,12 @@ import type { ResponseProps } from "@/types";
 export const POST: APIRoute = async ({request, cookies, redirect}) => {
     try {
         const data = await request.formData();
-        const image = data.get("image")!;
         const storeId = data.get("storeId")!;
 
-        const formData = new FormData();
-        formData.append("Image", image);
-
         const response = await serverApi.request<ResponseProps>({
-            url: "/Attendance/check-attendance",
+            url: process.env.PUBLIC_FASTAPUI_URL + "/api/verify-face",
             method: "POST",
-            data: formData,
+            data: data,
         });
 
         if (response.token && response.expiration) {

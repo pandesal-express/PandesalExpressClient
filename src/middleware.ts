@@ -1,18 +1,27 @@
 import { defineMiddleware } from "astro/middleware";
 import { serverApi } from "@/lib/server-api";
-import type { Employee, ResponseProps } from "@/types";
+import type { AuthResponse, Employee } from "@/types";
+
+const PUBLIC_ROUTES = ['/login', '/register', '/attendance'];
 
 export const onRequest = defineMiddleware(async (context, next) => {
     const url = new URL(context.request.url);
+
+    // check if the url is /api/*
+    if (PUBLIC_ROUTES.some(route => url.pathname.startsWith(route))) {
+        return next();
+    }
 
     // check if the url has storeId in searchParams
     const storeId = url.searchParams.get('storeId');
 
     if (!storeId) {
         context.locals.error = 'Please use the bookmarked/saved link to access your Store';
-        url.pathname = '/'
 
-        return next(url);
+        url.pathname = '/login';
+        context.url = url;
+
+        return await next("/login");
     }
 
     // Get token from cookies
@@ -21,7 +30,11 @@ export const onRequest = defineMiddleware(async (context, next) => {
     console.log('Token:', token);
 
     if (!token) {
-        return next(url);
+        url.pathname = "/login";
+        url.searchParams.set('storeId', storeId!);
+        context.url = url;
+
+        return await next(url);
     }
 
     try {
@@ -29,15 +42,15 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
         const user = await serverApi.request<Employee>({
             method: 'GET',
-            url: '/Auth/me',
+            url: '/auth/me',
             headers: {'Authorization': `Bearer ${token}`},
         });
 
         if (!user) {
-            console.log('User data fetched. Refreshing token...');
+            console.log('User data not fetched. Refreshing token...');
 
-            const refreshResponse = await serverApi.request<ResponseProps>({
-                url: '/Auth/refresh-token',
+            const refreshResponse = await serverApi.request<AuthResponse>({
+                url: '/auth/refresh-token',
                 method: 'POST',
                 headers: {'Authorization': `Bearer ${token}`},
             });
@@ -68,7 +81,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
             context.locals.user = refreshResponse.user;
             context.locals.token = refreshResponse.token;
 
-            return next();
+            return await next();
         }
 
         context.locals.user = user;
@@ -84,12 +97,12 @@ export const onRequest = defineMiddleware(async (context, next) => {
             }
         }
 
-        return next(url);
+        return await next(url);
     } catch (error) {
         console.error('Authentication error:', error);
 
         context.cookies.delete('jwt_token');
         context.cookies.delete('refresh_token');
-        return next(url);
+        return await next(url);
     }
 });

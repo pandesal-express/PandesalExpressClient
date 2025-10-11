@@ -8,7 +8,7 @@ export class ServerApi {
         this.api = axios.create({
             baseURL: import.meta.env.PUBLIC_API_URL,
             httpsAgent: new https.Agent({
-                rejectUnauthorized: false, // for dev only
+                rejectUnauthorized: import.meta.env.PROD, // for dev only
             }),
             withCredentials: true, // Important for cookies
         });
@@ -22,6 +22,7 @@ export class ServerApi {
             }
 
             const response: AxiosResponse<T> = await this.api.request({
+                baseURL: config.baseURL,
                 method: config.method,
                 url: `/api${config.url}`,
                 data: config.data,

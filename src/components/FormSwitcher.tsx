@@ -20,7 +20,7 @@ const FormSwitcher: FC<FormSwitcherProps> = ({departments, serverError}) => {
             x: 0,
             opacity: 1,
         },
-        exit: (direction: number) => ({
+        exit: () => ({
             opacity: 0,
         }),
     };

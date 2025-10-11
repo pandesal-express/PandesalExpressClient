@@ -11,10 +11,6 @@ export interface Employee extends Table {
     lastName: string,
     email: string,
     position: string,
-    sssNumber?: string,
-    philhealthNumber?: string,
-    tinNumber?: string,
-    pagIbigNumber?: string,
     department?: Department,
     attendances?: Attendance[],
     store?: Store,
@@ -41,7 +37,6 @@ export interface Store extends Table {
     openingTime: string,
     closingTime: string,
     employees?: Employee[],
-    products: Product[],
     storeInventories?: StoreInventory[],
     previousShiftDeliveredStocks?: StoreInventory[],
 }
@@ -67,9 +62,19 @@ export interface StoreInventory extends Table {
     pullOutDateTime?: string | null;
 }
 
-export interface ResponseProps {
+export interface AuthResponse {
     token: string;
     refreshToken: string;
     expiration: string;
+    refreshTokenExpiration: string;
     user: Employee;
+}
+
+export interface FastApiResponse {
+    message: string;
+    success: boolean;
+    data?: {
+        userId: string;
+        jwt_token: string;
+    };
 }

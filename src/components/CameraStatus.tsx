@@ -23,7 +23,7 @@ const CameraStatus: React.FC<{ status: string }> = ({status}) => {
 
     return (
         <Chip
-            variant='flat'
+            variant='shadow'
             color={statusInfo.color}
             size='sm'
             startContent={<IconVideoCameraDuotone className='w-4 h-4 mx-2' />}

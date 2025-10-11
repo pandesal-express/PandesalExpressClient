@@ -171,7 +171,7 @@ const CameraPreview: React.FC<CameraPreviewProps> = ({setAlertMessage}) => {
                 <h4>Camera Preview</h4>
                 <CameraStatus status={status} />
             </div>
-            <div className='relative p-2 sm:p-10 sm:mx-3'>
+            <div className='relative p-2 sm:p-3 sm:mx-3'>
                 <Card className='border-none' radius='lg'>
                     <video
                         className='object-cover aspect-auto'

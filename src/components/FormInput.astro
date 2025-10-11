@@ -1,0 +1,22 @@
+---
+import FormSwitcher from "@/components/FormSwitcher";
+import { type Department } from "@/types";
+import { serverApi } from "@/lib/server-api";
+
+let departments: Department[] = [];
+let serverError: string | null = null;
+
+try {
+    departments = (await serverApi.request<Department[]>({
+        url: '/department',
+        method: 'GET',
+    })) ?? [];
+} catch (e) {
+    console.error('Error fetching departments:', e);
+    serverError = "Failed to load departments. Please try again later.";
+}
+---
+
+<div>
+    <FormSwitcher client:load departments={departments} serverError={serverError} />
+</div>

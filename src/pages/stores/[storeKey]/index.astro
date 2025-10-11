@@ -1,0 +1,50 @@
+---
+import MainLayout from "@/layouts/MainLayout.astro";
+import type { Store } from "@/types";
+import { serverApi } from "@/lib/server-api";
+import { Spinner } from "@heroui/react";
+
+const token = Astro.cookies.get('jwt_token')!.value;
+const user = Astro.locals.user!;
+const {storeKey} = Astro.params;
+
+let store: Store | null = null;
+let error: string | null = null;
+
+try {
+    store = await serverApi.request<Store>({
+        method: 'GET',
+        url: `/store/${storeKey!}`,
+        headers: {Authorization: `Bearer ${token}`},
+    });
+} catch (e: any) {
+    console.error(`Error fetching store data for ${storeKey}:`, e);
+    error = e.message || "Failed to load store data.";
+}
+---
+
+<MainLayout title={store ? store.name : 'Store Dashboard'}>
+    <div class='container mx-auto py-6 px-2 md:px-4'>
+        {error && (
+                <div class='bg-danger/20 text-danger p-4 rounded-md mb-6 text-center'>
+                    <p class='font-bold text-lg'>Something went wrong.</p>
+                    <p>{error}</p>
+                    <p class='mt-2 inline-block'>
+                        Please refresh the page.
+                    </p>
+                </div>
+        )}
+
+        {!error && !store && (
+                <div class='bg-warning/20 text-warning p-4 rounded-md mb-6 text-center'>
+                    <Spinner size='lg' />
+                    <p class='font-bold text-lg animate-pulse'>Loading store data</p>
+                </div>
+        )}
+
+        {!error && store && (
+                <div>
+                </div>
+        )}
+    </div>
+</MainLayout>

@@ -1,0 +1,27 @@
+---
+import LoginForm from "@/components/auth/LoginForm";
+import MainLayout from "@/layouts/MainLayout.astro";
+import { Link } from "@heroui/react";
+
+const storeId = new URLSearchParams(Astro.url.search).get('storeId')!;
+const error = Astro.locals.error;
+---
+
+<MainLayout>
+    <main class='flex items-center justify-center py-12'>
+        <div class='flex w-full max-w-screen-md flex-col items-start px-8'>
+            <h4 class='text-lg font-semibold text-default-foreground mb-4 px-4 sm:px-0'>
+                Face Recognition Attendance
+            </h4>
+            <p class='text-body font-body text-subtext-color mb-7'>
+                Please look at the camera and click <strong>check in/out</strong> to record your attendance
+            </p>
+            <LoginForm serverError={error} client:load />
+            <p class='w-full text-center mt-5'>
+                <Link href=`/register?storeId=${storeId}` isDisabled={error != null}>
+                    Register here
+                </Link>
+            </p>
+        </div>
+    </main>
+</MainLayout>

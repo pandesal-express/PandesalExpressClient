@@ -1,0 +1,29 @@
+---
+import MainLayout from "@/layouts/MainLayout.astro";
+import FormInput from "@/components/FormInput.astro";
+import { Link } from "@heroui/react";
+import Stepper from "@/components/Stepper";
+
+const storeId = new URLSearchParams(Astro.url.search).get('storeId')!;
+const steps = [
+    {label: 'Account Info', description: 'Fill in your details'},
+    {label: 'Face Register', description: 'Register your face'},
+];
+---
+
+<MainLayout>
+    <main class='flex items-center justify-center h-lvh'>
+        <div class='flex w-full flex-col gap-4 px-8 pb-10 pt-6 space-y-7 items-center'>
+            <p class='pb-4 text-center text-3xl font-semibold'>
+                Sign up
+            </p>
+            <Stepper client:visible steps={steps} />
+            <FormInput />
+            <p class='text-center text-small'>
+                <Link href=`/login?storeId=${storeId}` size='sm'>
+                    Already have an account? Log In
+                </Link>
+            </p>
+        </div>
+    </main>
+</MainLayout>

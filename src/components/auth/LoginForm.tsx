@@ -1,10 +1,11 @@
-import CameraPreview from "@/components/CameraPreview";
+import CameraPreview from "@/components/CameraPreview.tsx";
 import { Alert } from "@heroui/alert";
 import { useState } from "react";
 import { Button } from "@heroui/react";
-import { IconLineLogin, IconLineLogout } from "@/components/Icons";
+import { IconLineLogin, IconLineLogout } from "@/components/Icons.tsx";
+import { videoToBlob } from "@/lib/videoToBlob.ts";
 
-const CameraComponent = ({serverError}: { serverError?: string }) => {
+const LoginForm = ({serverError}: { serverError?: string }) => {
     const [loading, setLoading] = useState<boolean>(false);
     const [alertInfo, setAlertInfo] = useState<{
         color: "default" | "primary" | "secondary" | "success" | "warning" | "danger" | undefined,
@@ -21,49 +22,20 @@ const CameraComponent = ({serverError}: { serverError?: string }) => {
             return;
         }
 
-        const canvas = document.createElement('canvas');
-        canvas.width = videoElement.videoWidth;
-        canvas.height = videoElement.videoHeight;
-        const ctx = canvas.getContext('2d');
-        if (!ctx) {
-            setAlertInfo({color: "danger", description: "Could not get canvas context."});
-            return;
-        }
-        ctx.drawImage(videoElement, 0, 0);
-
         setLoading(true);
         setAlertInfo({color: "default", description: "Processing..."});
 
-        const storeIdFromUrl = new URLSearchParams(window.location.search).get('storeId');
-
-        canvas.toBlob((blob) => {
-            if (!blob) {
-                setAlertInfo({color: "danger", description: "Could not capture image, Please try refereshing the page."});
-                setLoading(false);
-                return;
-            }
-
-            // To send image (Blob), check_in (bool), and store_id (string)
+        videoToBlob(videoElement).then(blob => {
+            const storeIdFromUrl = new URLSearchParams(window.location.search).get('storeId')!;
             const formData = new FormData();
+            const endpoint = isCheckIn ? "/api/auth/login" : "/api/auth/logout";
+
             formData.append('image', blob, 'image.png');
-            formData.append('check_in', isCheckIn ? 'true' : 'false');
+            formData.append('store_id', storeIdFromUrl);
 
-            if (storeIdFromUrl) {
-                formData.append('store_id', storeIdFromUrl);
-            }
-
-            fetch("/api/check-attendance", {
+            fetch(endpoint, {
                 method: 'POST',
                 body: formData,
-            }).then(async (response) => {
-                if (!response.ok) {
-                    const errorData = await response.json().catch(() => ({message: `HTTP error! Status: ${response.status}`}));
-                    throw new Error(errorData.message ?? "An error occurred, please try again");
-                }
-
-                console.log("Response from Astro API route:", response);
-
-                window.location.href = `/stores/${storeIdFromUrl}`;
             }).catch((err) => {
                 console.error("Error in checking attendance: ", err);
                 setAlertInfo({
@@ -71,27 +43,28 @@ const CameraComponent = ({serverError}: { serverError?: string }) => {
                     description: err.message ?? "An error occurred, please try again",
                 });
             }).finally(() => setLoading(false));
-
-        }, 'image/png');
+        }).catch((err: Error) => {
+            setAlertInfo({color: "danger", description: err.message ?? "Could not capture image. Please try refreshing the page."});
+        }).finally(() => setLoading(false));
     };
 
     return (
         <>
-            <p className='text-body font-body text-subtext-color mb-7'>
-                Please look at the camera and click check in/out to record your attendance
-            </p>
-
-            <div className='space-y-7'>
+            <div className='space-y-5'>
                 <CameraPreview setAlertMessage={setAlertInfo} />
                 <Alert
                     color={serverError ? 'danger' : alertInfo.color}
-                    description={serverError ?? alertInfo.description}
+                    title={serverError ?? alertInfo.description}
                 />
 
+                <p className='w-full text-center text-small'>
+                    NOTE: Only one person should be in the frame at a time.
+                </p>
                 <div className='flex w-full items-center justify-center gap-4'>
                     <Button
                         variant='solid'
                         color='primary'
+                        size='lg'
                         startContent={<IconLineLogin />}
                         onPress={(_) => handleSubmitAttendance()}
                         isDisabled={loading || serverError != undefined}
@@ -99,7 +72,8 @@ const CameraComponent = ({serverError}: { serverError?: string }) => {
                         Check In
                     </Button>
                     <Button
-                        variant='solid'
+                        variant='bordered'
+                        size='lg'
                         startContent={<IconLineLogout />}
                         onPress={(_) => handleSubmitAttendance(false)}
                         isDisabled={loading || serverError != undefined}
@@ -112,4 +86,4 @@ const CameraComponent = ({serverError}: { serverError?: string }) => {
     );
 }
 
-export default CameraComponent;
+export default LoginForm;
